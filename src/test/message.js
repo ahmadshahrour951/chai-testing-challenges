@@ -123,3 +123,37 @@ describe('Message API endpoints', () => {
           });
       });
   });
+
+  it('should update a message', (done) => {
+    const messageUpdate = {
+      title: 'updatedTitle',
+      body: 'updatedBody',
+    };
+
+    agent
+      .put(`/messages/${TEST_MESSAGE_ID_1}`)
+      // .set('content-type', 'application/x-www-form-urlencoded')
+      .send(messageUpdate)
+      .end((err, res) => {
+        if (err) done(err);
+
+        // Checking agent response
+        expect(res).to.have.status(200);
+        expect(res.body).is.instanceof(Object);
+        expect(res.body.message).to.have.property('title', 'updatedTitle');
+        expect(res.body.message).to.have.property('body', 'updatedBody');
+
+        // Checking directly in database
+        Message.findById(TEST_MESSAGE_ID_1)
+          .then((message) => {
+            expect(message).is.instanceof(Object);
+            expect(message).to.have.property('title', 'updatedTitle');
+            expect(message).to.have.property('body', 'updatedBody');
+            return done();
+          })
+          .catch((error) => {
+            console.log(error);
+            done(error);
+          });
+      });
+  });
