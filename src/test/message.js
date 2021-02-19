@@ -88,3 +88,38 @@ describe('Message API endpoints', () => {
       done();
     });
   });
+
+  it('should post a new message', (done) => {
+    const messageTest_2 = new Message({
+      title: 'titletest2',
+      body: 'bodytest2',
+      author: TEST_AUTHOR_ID,
+      _id: TEST_MESSAGE_ID_2,
+    });
+
+    agent
+      .post('/messages')
+      .send(messageTest_2)
+      .end((err, res) => {
+        if (err) done(err);
+
+        // Checking agent response
+        expect(res).to.have.status(200);
+        expect(res.body).is.instanceof(Object);
+        expect(res.body).to.have.property('title', 'titletest2');
+        expect(res.body).to.have.property('body', 'bodytest2');
+
+        // Checking directly in database
+        Message.findById(TEST_MESSAGE_ID_2)
+          .then((message) => {
+            expect(message).is.instanceof(Object);
+            expect(message).to.have.property('title', 'titletest2');
+            expect(message).to.have.property('body', 'bodytest2');
+            return done();
+          })
+          .catch((error) => {
+            console.log(error)
+            done(error)
+          });
+      });
+  });
