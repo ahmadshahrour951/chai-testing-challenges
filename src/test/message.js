@@ -65,3 +65,26 @@ describe('Message API endpoints', () => {
       })
       .catch((err) => done(err));
   });
+
+  it('should load all messages', (done) => {
+    agent.get('/messages').end((err, res) => {
+      if (err) done(err);
+
+      expect(res).to.have.status(200);
+      expect(res.body.messages).to.be.an('array').with.lengthOf(1);
+      done();
+    });
+  });
+
+  it('should get one specific message', (done) => {
+    agent.get(`/messages/${TEST_MESSAGE_ID_1}`).end((err, res) => {
+      if (err) done(err);
+
+      expect(res).to.have.status(200);
+      expect(res.body).is.instanceof(Object);
+
+      expect(res.body).to.have.property('title', 'titletest1');
+      expect(res.body).to.have.property('body', 'bodytest1');
+      done();
+    });
+  });
