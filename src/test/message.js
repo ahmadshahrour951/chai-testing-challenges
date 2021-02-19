@@ -157,3 +157,30 @@ describe('Message API endpoints', () => {
           });
       });
   });
+
+  it('should delete a message', (done) => {
+    agent.delete(`/messages/${TEST_MESSAGE_ID_1}`).end((err, res) => {
+      if (err) done(err);
+
+      // Checking agent response
+      expect(res).to.have.status(200);
+      expect(res.body).is.instanceof(Object);
+      expect(res.body).to.have.property(
+        'message',
+        'Message Successfully deleted.'
+      );
+      expect(res.body).to.have.property('_id', TEST_MESSAGE_ID_1);
+
+      // Checking directly in database
+      Message.findById(TEST_MESSAGE_ID_1)
+        .then((message) => {
+          expect(message).to.equal(null);
+          done();
+        })
+        .catch((error) => {
+          console.log(error);
+          done(error);
+        });
+    });
+  });
+});
